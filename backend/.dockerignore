@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# Maven build artifacts
+target/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files not needed in the build context
+Dockerfile
+.dockerignore
