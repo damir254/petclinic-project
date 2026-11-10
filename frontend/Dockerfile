@@ -14,6 +14,8 @@ FROM nginx:1.31.8 as runtime
 
 COPY --from=build /app/dist/browser/ /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY env.js.template /etc/nginx/templates/env.js.template
+ENV NGINX_ENVSUBST_OUTPUT_DIR=/usr/share/nginx/html/assets
 
 RUN mkdir -p /tmp/run
 

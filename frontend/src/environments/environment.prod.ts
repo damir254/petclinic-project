@@ -20,7 +20,11 @@
  * @author Vitaliy Fedoriv
  */
 
+const runtime = window as unknown as Window & {
+  __env: { REST_API_URL: string };
+};
+
 export const environment = {
   production: true,
-  REST_API_URL: 'http://localhost:9966/petclinic/api/'
+  REST_API_URL: runtime.__env.REST_API_URL
 };

@@ -21,7 +21,12 @@
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
+
+const runtime = window as unknown as  Window & {
+  __env: { REST_API_URL: string };
+};
+
 export const environment = {
   production: false,
-  REST_API_URL: 'http://localhost:9966/petclinic/api/'
+  REST_API_URL: runtime.__env.REST_API_URL
 };
