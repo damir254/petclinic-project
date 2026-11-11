@@ -28,5 +28,5 @@ const runtime = window as unknown as  Window & {
 
 export const environment = {
   production: false,
-  REST_API_URL: runtime.__env.REST_API_URL
+  REST_API_URL: runtime.__env?.REST_API_URL ?? 'http://localhost:9966/petclinic/api/'
 };
