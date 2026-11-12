@@ -13,8 +13,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=postgres,spring-data-jpa
       - POSTGRES_URL=jdbc:postgresql://petclinic-db:5432/petclinic
-      - POSTGRES_USER=petclinic
-      - POSTGRES_PASS=petclinic
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
     depends_on:
       petclinic-db:
         condition: service_healthy
@@ -25,8 +25,8 @@ services:
     image: postgres:18
     environment:
       - POSTGRES_DB=petclinic
-      - POSTGRES_USER=petclinic
-      - POSTGRES_PASSWORD=petclinic
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASS}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
