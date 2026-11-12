@@ -1,0 +1,42 @@
+services:
+  frontend:
+    build: ./frontend/
+    ports:
+      - "8080:8080"
+    environment:
+      - REST_API_URL=http://localhost:9966/petclinic/api/
+    restart: always
+  backend:
+    build: ./backend/
+    ports:
+      - "9966:9966"
+    environment:
+      - SPRING_PROFILES_ACTIVE=postgres,spring-data-jpa
+      - POSTGRES_URL=jdbc:postgresql://petclinic-db:5432/petclinic
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+    depends_on:
+      petclinic-db:
+        condition: service_healthy
+
+    restart: always
+
+  petclinic-db:
+    image: postgres:18
+    environment:
+      - POSTGRES_DB=petclinic
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASS}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    volumes:
+      - petclinic-data:/var/lib/postgresql
+    restart: always
+
+
+volumes:
+  petclinic-data:
