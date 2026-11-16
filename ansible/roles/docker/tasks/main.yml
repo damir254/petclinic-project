@@ -29,7 +29,7 @@
 
 - name: Download Docker Compose
   ansible.builtin.get_url:
-    url: https://github.com/docker/compose/releases/download/v5.6.0/docker-compose-linux-{{ansible_facts['architecture' ]}}
-    checksum: "sha256:https://github.com/docker/compose/releases/download/v5.6.0/docker-compose-linux-{{ ansible_facts['architecture'] }}.sha256"
+    url: '{{ docker_compose_url }}'
+    checksum: "sha256:{{ docker_compose_url }}.sha256"
     dest: /usr/local/lib/docker/cli-plugins/docker-compose
     mode: '0755'
