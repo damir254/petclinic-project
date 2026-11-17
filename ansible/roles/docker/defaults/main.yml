@@ -1,0 +1,4 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for docker
+docker_compose_url: "https://github.com/docker/compose/releases/download/v5.6.0/docker-compose-linux-{{ ansible_facts['architecture' ]}}"

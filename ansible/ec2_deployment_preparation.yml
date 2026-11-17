@@ -1,0 +1,6 @@
+---
+- name: Prepare EC2 instance for deployment
+  hosts: petclinic
+  become: true
+  roles:
+    - docker

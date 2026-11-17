@@ -1,0 +1,35 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for docker
+- name: Install Docker
+  ansible.builtin.dnf:
+    name: docker
+    state: present
+
+
+- name: Ensure Docker service is started and enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+    
+
+- name: Add user to docker group
+  ansible.builtin.user:
+    name: ec2-user
+    state: present
+    groups: docker
+    append: yes
+
+- name: Create Docker Compose directory
+  ansible.builtin.file:
+    path: /usr/local/lib/docker/cli-plugins
+    state: directory
+    mode: '0755'
+
+- name: Download Docker Compose
+  ansible.builtin.get_url:
+    url: '{{ docker_compose_url }}'
+    checksum: "sha256:{{ docker_compose_url }}.sha256"
+    dest: /usr/local/lib/docker/cli-plugins/docker-compose
+    mode: '0755'
