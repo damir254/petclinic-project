@@ -1,0 +1,17 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for petclinic
+
+app_dir: "/opt/petclinic"
+
+backend_path: "/petclinic/api/"
+spring_profiles: "postgres,spring-data-jpa"
+postgres_db: "petclinic"
+postgres_url: "jdbc:postgresql://petclinic-db:5432/{{ postgres_db }}"
+
+frontend_image: "damir254/petclinic-frontend"
+frontend_image_tag: "1.0"
+
+
+backend_image: "damir254/petclinic-backend"
+backend_image_tag: "1.0"
