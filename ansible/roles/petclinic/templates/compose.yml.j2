@@ -1,0 +1,48 @@
+services:
+  frontend:
+    image: '{{ frontend_image}}:${FRONTEND_IMAGE_TAG}'
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      - REST_API_URL={{ backend_path }}
+    restart: always
+  backend:
+    image: '{{ backend_image }}:${BACKEND_IMAGE_TAG}'
+    ports:
+      - "127.0.0.1:9966:9966"
+    environment:
+      - SPRING_PROFILES_ACTIVE={{ spring_profiles }}
+      - POSTGRES_URL={{ postgres_url }}
+      # - POSTGRES_USER=${POSTGRES_USER}
+      # - POSTGRES_PASS=${POSTGRES_PASS}
+    env_file:
+      - path: .env.credentials
+        format: raw
+    depends_on:
+      petclinic-db:
+        condition: service_healthy
+
+    restart: always
+
+  petclinic-db:
+    image: postgres:18
+    environment:
+      - POSTGRES_DB={{ postgres_db }}
+      # - POSTGRES_USER=${POSTGRES_USER}
+      # - POSTGRES_PASSWORD=${POSTGRES_PASS}
+    env_file:
+      - path: .env.credentials
+        format: raw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - petclinic-data:/var/lib/postgresql
+    restart: always
+
+
+volumes:
+  petclinic-data:

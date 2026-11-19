@@ -1,0 +1,8 @@
+---
+
+- name: Deploy Petclinic application
+  hosts: petclinic
+  become: true
+  roles:
+    - petclinic
+    - nginx

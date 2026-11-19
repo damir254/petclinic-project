@@ -1,0 +1,41 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for petclinic
+
+- name: Create application directory
+  ansible.builtin.file:
+    path: '{{ app_dir }}'
+    state: directory
+    mode: '0700'
+
+- name: Load vault variables
+  ansible.builtin.include_vars:
+    file: vault.yml
+  no_log: true
+
+- name: Create .env file
+  ansible.builtin.template:
+    src: .env.j2
+    dest: '{{ app_dir }}/.env'
+    mode: '0600'
+  no_log: true
+
+- name: Create .env.credentials file
+  ansible.builtin.template:
+    src: .env.credentials.j2
+    dest: '{{ app_dir }}/.env.credentials'
+    mode: '0600'
+  no_log: true
+
+- name: Create compose.yml file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: '{{ app_dir }}/compose.yml'
+    mode: '0600'
+
+- name: Start petclinic application
+  community.docker.docker_compose_v2:
+    project_src: '{{ app_dir }}'
+    pull: missing
+    state: present
+
