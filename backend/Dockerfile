@@ -7,7 +7,7 @@ COPY .mvn/ .mvn/
 
 RUN bash ./mvnw dependency:go-offline -B
 
-COPY . ./
+COPY src ./src
 
 RUN bash ./mvnw clean package
 
