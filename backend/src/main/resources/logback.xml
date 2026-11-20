@@ -1,22 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 
-<configuration scan="true" scanPeriod="30 seconds">
+<configuration>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
     </contextListener>
     
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%-5level %logger{0} - %msg%n</pattern>
+    <appender name="console-stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <target>System.out</target>
+        <encoder class="ch.qos.logback.classic.encoder.JsonEncoder">
+            <withFormattedMessage>true</withFormattedMessage>
+            <withMessage>false</withMessage>
+            <withArguments>false</withArguments>
+            <withNanoseconds>false</withNanoseconds>
+        
+        </encoder>
+
+
+    </appender>
+
+    <appender name="console-stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <target>System.err</target>
+        <encoder class="ch.qos.logback.classic.encoder.JsonEncoder">
+            <withFormattedMessage>true</withFormattedMessage>
+            <withMessage>false</withMessage>
+            <withArguments>false</withArguments>
+            <withNanoseconds>false</withNanoseconds>
+        
         </encoder>
     </appender>
 
     <!--<logger name="org.hibernate" level="debug"/> -->
-    <logger name="org.springframework.samples.petclinic" level="debug"/>
+    <!-- <logger name="org.springframework.samples.petclinic" level="debug"/> -->
 
     <root level="info">
-        <appender-ref ref="console"/>
+        <appender-ref ref="console-stdout"/>
+        <appender-ref ref="console-stderr"/>
     </root>
 </configuration>
