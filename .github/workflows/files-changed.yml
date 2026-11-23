@@ -1,0 +1,49 @@
+name: Detect changed files
+
+on:
+    workflow_call:
+    
+        outputs:
+            frontend: 
+                value: ${{jobs.files-changed.outputs.frontend}}
+            backend: 
+                value: ${{jobs.files-changed.outputs.backend}}
+            ansible:
+                value: ${{jobs.files-changed.outputs.ansible}}
+            compose:
+                value: ${{jobs.files-changed.outputs.compose}}
+
+jobs:
+
+    files-changed:
+            runs-on: ubuntu-24.04
+            outputs:
+                frontend: ${{ steps.filter.outputs.frontend }}
+                backend: ${{ steps.filter.outputs.backend }}
+                ansible: ${{ steps.filter.outputs.ansible }}
+                compose: ${{ steps.filter.outputs.compose }}
+            steps:
+                - uses: actions/checkout@v7
+
+                - uses: dorny/paths-filter@v4
+                  id: filter
+                  with:
+                        predicate-quantifier: 'some-with-excludes'
+                        filters: |
+                            frontend:
+                                - 'frontend/**'
+                                - '!frontend/README.md'
+                                - '!frontend/docs/**'
+                            backend:
+                                - 'backend/**'
+                                - '!backend/readme.md'
+                                - '!backend/LICENSE.txt'
+                                - '!backend/terms.txt'
+                                - '!backend/src/test/jmeter/README.md'
+                                - '!backend/src/test/postman/README.md'
+                            ansible:
+                                - 'ansible/**'
+                            compose:
+                                - 'compose.yml'
+                
+            
