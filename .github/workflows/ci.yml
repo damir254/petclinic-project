@@ -45,6 +45,20 @@ jobs:
             - name: Run E2E Tests
               run: npm run e2e
 
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
+
+            - name: Docker Build 
+              uses: docker/build-push-action@v7
+              with:
+                context: "{{defaultContext}}:frontend"
+                cache-from: type=gha,scope=frontend
+                # cache-to: type=gha,mode=max,scope=frontend
+                push: false
+                tags: ${{vars.DOCKERHUB_USERNAME}}/petclinic-frontend:${{github.sha}}
+
+            
+
 
     backend:
         runs-on: ubuntu-24.04
@@ -65,6 +79,19 @@ jobs:
 
             - name: Build
               run: ./mvnw -B verify 
+
+            
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
+
+            - name: Docker Build 
+              uses: docker/build-push-action@v7
+              with:
+                context: "{{defaultContext}}:backend"
+                cache-from: type=gha,scope=backend
+                # cache-to: type=gha,mode=max,scope=backend
+                push: false
+                tags: ${{vars.DOCKERHUB_USERNAME}}/petclinic-backend:${{github.sha}}
     
 
     ansible:
