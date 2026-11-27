@@ -17,6 +17,9 @@ jobs:
         defaults:
             run:
                 working-directory: frontend
+        env:
+          DOCKER_IMAGE: "${{vars.DOCKERHUB_USERNAME}}/petclinic-frontend:${{github.sha}}"
+
         steps:
             - uses: actions/checkout@v7
 
@@ -55,7 +58,18 @@ jobs:
                 cache-from: type=gha,scope=frontend
                 # cache-to: type=gha,mode=max,scope=frontend
                 push: false
-                tags: ${{vars.DOCKERHUB_USERNAME}}/petclinic-frontend:${{github.sha}}
+                load: true
+                tags: ${{env.DOCKER_IMAGE}}
+
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@v0.36.0 
+              with:
+                image-ref: ${{env.DOCKER_IMAGE}}
+                format: 'table'
+                exit-code: '1'
+                ignore-unfixed: true
+                vuln-type: 'os,library'
+                severity: 'CRITICAL,HIGH'
 
             
 
@@ -67,6 +81,9 @@ jobs:
         defaults:
             run:
                 working-directory: backend
+        env:
+          DOCKER_IMAGE: "${{vars.DOCKERHUB_USERNAME}}/petclinic-backend:${{github.sha}}"
+
         steps:
             - uses: actions/checkout@v7
 
@@ -91,7 +108,18 @@ jobs:
                 cache-from: type=gha,scope=backend
                 # cache-to: type=gha,mode=max,scope=backend
                 push: false
-                tags: ${{vars.DOCKERHUB_USERNAME}}/petclinic-backend:${{github.sha}}
+                load: true
+                tags: ${{env.DOCKER_IMAGE}}
+
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@v0.36.0 
+              with:
+                image-ref: ${{env.DOCKER_IMAGE}}
+                format: 'table'
+                exit-code: '1'
+                ignore-unfixed: true
+                vuln-type: 'os,library'
+                severity: 'CRITICAL,HIGH'
     
 
     ansible:

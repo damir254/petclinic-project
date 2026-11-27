@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build -- --configuration production 
 
-FROM nginx:1.31.8 as runtime
+FROM nginx:1.31.10-alpine-slim as runtime
 
 COPY --from=build /app/dist/browser/ /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
