@@ -9,7 +9,7 @@ RUN bash ./mvnw dependency:go-offline -B
 
 COPY src ./src
 
-RUN bash ./mvnw clean package
+RUN bash ./mvnw clean package -DskipTests
 
 
 

@@ -1,0 +1,160 @@
+on:
+    pull_request:
+        branches: [ main ]
+permissions:
+    contents: read
+    pull-requests: read
+
+jobs:
+    files-changed:
+        uses: ./.github/workflows/files-changed.yml
+        
+
+    frontend:
+        runs-on: ubuntu-24.04
+        needs: files-changed
+        if: needs.files-changed.outputs.frontend == 'true'
+        defaults:
+            run:
+                working-directory: frontend
+        env:
+          DOCKER_IMAGE: "${{vars.DOCKERHUB_USERNAME}}/petclinic-frontend:${{github.sha}}"
+
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v7
+              with:
+                    node-version: '24'
+                    cache: 'npm'
+                    cache-dependency-path: frontend/package-lock.json
+
+            - name: Install dependencies
+              run: npm ci 
+            
+            - name: Build
+              run: npm run build -- --configuration production
+            
+            - name: Lint
+              run: npm run lint
+
+            - name: Test
+              run: npm run test:ci
+
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps --only-shell chromium
+
+            - name: Run E2E Tests
+              run: npm run e2e
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
+
+            - name: Docker Build 
+              uses: docker/build-push-action@v7
+              with:
+                context: "{{defaultContext}}:frontend"
+                cache-from: type=gha,scope=frontend
+                # cache-to: type=gha,mode=max,scope=frontend
+                push: false
+                load: true
+                tags: ${{env.DOCKER_IMAGE}}
+
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@v0.36.0 
+              with:
+                image-ref: ${{env.DOCKER_IMAGE}}
+                format: 'table'
+                exit-code: '1'
+                ignore-unfixed: true
+                vuln-type: 'os,library'
+                severity: 'CRITICAL,HIGH'
+
+            
+
+
+    backend:
+        runs-on: ubuntu-24.04
+        needs: files-changed
+        if: needs.files-changed.outputs.backend == 'true'
+        defaults:
+            run:
+                working-directory: backend
+        env:
+          DOCKER_IMAGE: "${{vars.DOCKERHUB_USERNAME}}/petclinic-backend:${{github.sha}}"
+
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Set up JDK 25
+              uses: actions/setup-java@v6
+              with:
+                java-version: '25'
+                distribution: 'temurin'
+                cache: 'maven'
+
+            - name: Build
+              run: ./mvnw -B verify 
+
+            
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
+
+            - name: Docker Build 
+              uses: docker/build-push-action@v7
+              with:
+                context: "{{defaultContext}}:backend"
+                cache-from: type=gha,scope=backend
+                # cache-to: type=gha,mode=max,scope=backend
+                push: false
+                load: true
+                tags: ${{env.DOCKER_IMAGE}}
+
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@v0.36.0 
+              with:
+                image-ref: ${{env.DOCKER_IMAGE}}
+                format: 'table'
+                exit-code: '1'
+                ignore-unfixed: true
+                vuln-type: 'os,library'
+                severity: 'CRITICAL,HIGH'
+    
+
+    ansible:
+        name: Ansible Lint
+        runs-on: ubuntu-24.04
+        needs: files-changed
+        if: needs.files-changed.outputs.ansible == 'true'
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: ansible/ansible-lint@v26.11.0
+              with:
+                working_directory: ansible
+                requirements_file: requirements.yml
+                args: --profile min
+
+
+
+    compose:
+        name: Docker Compose Validation
+        runs-on: ubuntu-24.04
+        needs: files-changed
+        if: needs.files-changed.outputs.compose == 'true'
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: Validate Docker Compose
+              env:
+                POSTGRES_USER: dummyuser
+                POSTGRES_PASS: dummypass
+              run: docker compose config --quiet
+
+    
+
+              
+
+           
+
